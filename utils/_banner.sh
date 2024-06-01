@@ -21,20 +21,7 @@ print_banner() {
 
   printf "\n\n"
 
-  printf "${CYAN_LIGHT}";
-  printf "                                                     ▄▄█▀▀▀▀▀▀▀█▄▄  \n";
-  printf "                                                   ${CYAN_LIGHT}▄█▀${NC}   ${WHITE}▄▄${NC}      ${CYAN_LIGHT}▀█▄\n";
-  printf "                                                   ${CYAN_LIGHT█${NC}    ${WHITE}███${NC}         ${CYAN_LIGHT}█\n";
-  printf "                                                   ${CYAN_LIGHT}█${NC}    ${WHITE}██▄         ${CYAN_LIGHT}█${NC}\n";
-  printf "                                                   ${CYAN_LIGHT}█${NC}     ${WHITE}▀██▄${NC} ${WHITE}██${NC}    ${CYAN_LIGHT}█\n";
-  printf "                                                   ${CYAN_LIGHT}█${NC}       ${WHITE}▀███▀${NC}    ${CYAN_LIGHT}█\n";
-  printf "                                                   ${CYAN_LIGHT}▀█▄           ▄█▀\n";
-  printf "                                                    ▄█    ▄▄▄▄█▀▀  \n";
-  printf "                                                    █  ▄█▀        \n";
-  printf "                                                    ▀▀▀▀          \n";
-  printf "${NC}";
-
-  printf "${CYAN_LIGHT}"
+printf "${CYAN_LIGHT}";
 
   printf "${CYAN_LIGHT}  _______  __    __       ___       __   __  ___   __    __       ${NC}\n"
   printf "${CYAN_LIGHT} |       ||  |  |  |     /   \\     |  | |  ||   | |  |  |  |      ${NC}\n"
@@ -43,8 +30,8 @@ print_banner() {
   printf "${CYAN_LIGHT} |  '--' ||  |  |  |  /  _____  \\  |       ||   |   \\    /        ${NC}\n"
   printf "${CYAN_LIGHT} |_______||__|  |__| /__/     \\__\\ |_______||___|    \\__/         ${NC}\n"
 
-  
-  printf "                ${NC}[${CYAN_LIGHT}Whaticket Label${NC}]${CYAN_LIGHT}\n"
+   printf "            \033[1;33m        © CANAL ChatBoard Channel - https://www.youtube.com/channel/UCMa9UDt137xjIEOxTwwL-Xw";
+  printf "${NC}";
 
-  printf "${NC}"
+  printf "\n"
 }
