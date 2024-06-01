@@ -3,7 +3,7 @@
 # Print banner art.
 
 #######################################
-# Print a board. 
+# Print a board.
 # Globals:
 #   BG_BROWN
 #   NC
@@ -21,7 +21,7 @@ print_banner() {
 
   printf "\n\n"
 
-printf "${CYAN_LIGHT}";
+  printf "${CYAN_LIGHT}";
 
   printf "${CYAN_LIGHT}  _______  __    __       ___       __   __  ___   __    __       ${NC}\n"
   printf "${CYAN_LIGHT} |       ||  |  |  |     /   \\     |  | |  ||   | |  |  |  |      ${NC}\n"
@@ -30,7 +30,7 @@ printf "${CYAN_LIGHT}";
   printf "${CYAN_LIGHT} |  '--' ||  |  |  |  /  _____  \\  |       ||   |   \\    /        ${NC}\n"
   printf "${CYAN_LIGHT} |_______||__|  |__| /__/     \\__\\ |_______||___|    \\__/         ${NC}\n"
 
-   printf "            \033[1;33m        © CANAL ChatBoard Channel - https://www.youtube.com/channel/UCMa9UDt137xjIEOxTwwL-Xw";
+  printf "            \033[1;33m        © CANAL ChatBoard Channel - https://www.youtube.com/channel/UCMa9UDt137xjIEOxTwwL-Xw";
   printf "${NC}";
 
   printf "\n"
