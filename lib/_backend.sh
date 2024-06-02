@@ -1,34 +1,33 @@
 #!/bin/bash
-#
-# functions for setting up app backend
+
+print_banner() {
+  echo "#######################################"
+  echo "#                                     #"
+  echo "#        Configuração do Backend      #"
+  echo "#                                     #"
+  echo "#######################################"
+}
+
 #######################################
-# creates REDIS db using docker
+# cria a db REDIS usando docker
 # Arguments:
 #   None
 #######################################
 backend_redis_create() {
   print_banner
-  printf "${WHITE} 💻 Criando Redis & Banco Postgres...${GRAY_LIGHT}"
-  printf "\n\n"
+  printf "${WHITE} 💻 Criando Redis & Banco Postgres...${GRAY_LIGHT}\n\n"
 
   sleep 2
 
-  sudo su - root <<EOF
   usermod -aG docker deploy
   docker run --name redis-${instancia_add} -p ${redis_port}:6379 --restart always --detach redis redis-server --requirepass ${mysql_root_password}
   
   sleep 2
-  sudo su - postgres
-  createdb ${instancia_add};
-  psql
-  CREATE USER ${instancia_add} SUPERUSER INHERIT CREATEDB CREATEROLE;
-  ALTER USER ${instancia_add} PASSWORD '${mysql_root_password}';
-  \q
-  exit
-EOF
 
-sleep 2
+  sudo -u postgres bash -c "createdb ${instancia_add}"
+  sudo -u postgres bash -c "psql -c \"CREATE USER ${instancia_add} SUPERUSER INHERIT CREATEDB CREATEROLE PASSWORD '${mysql_root_password}'\""
 
+  sleep 2
 }
 
 #######################################
@@ -38,23 +37,20 @@ sleep 2
 #######################################
 backend_set_env() {
   print_banner
-  printf "${WHITE} 💻 Configurando variáveis de ambiente (backend)...${GRAY_LIGHT}"
-  printf "\n\n"
+  printf "${WHITE} 💻 Configurando variáveis de ambiente (backend)...${GRAY_LIGHT}\n\n"
 
   sleep 2
 
-  # ensure idempotency
   backend_url=$(echo "${backend_url/https:\/\/}")
   backend_url=${backend_url%%/*}
-  backend_url=https://$backend_url
+  backend_url="https://${backend_url}"
 
-  # ensure idempotency
   frontend_url=$(echo "${frontend_url/https:\/\/}")
   frontend_url=${frontend_url%%/*}
-  frontend_url=https://$frontend_url
+  frontend_url="https://${frontend_url}"
 
-sudo su - deploy << EOF
-  cat <<[-]EOF > /home/deploy/${instancia_add}/backend/.env
+sudo -u deploy bash <<EOF
+  cat <<EOL > /home/deploy/${instancia_add}/backend/.env
 NODE_ENV=
 BACKEND_URL=${backend_url}
 FRONTEND_URL=${frontend_url}
@@ -78,26 +74,24 @@ REGIS_OPT_LIMITER_DURATION=3000
 USER_LIMIT=${max_user}
 CONNECTIONS_LIMIT=${max_whats}
 CLOSED_SEND_BY_ME=true
-
-[-]EOF
+EOL
 EOF
 
   sleep 2
 }
 
 #######################################
-# installs node.js dependencies
+# instala dependências do node.js
 # Arguments:
 #   None
 #######################################
 backend_node_dependencies() {
   print_banner
-  printf "${WHITE} 💻 Instalando dependências do backend...${GRAY_LIGHT}"
-  printf "\n\n"
+  printf "${WHITE} 💻 Instalando dependências do backend...${GRAY_LIGHT}\n\n"
 
   sleep 2
 
-  sudo su - deploy <<EOF
+  sudo -u deploy bash <<EOF
   cd /home/deploy/${instancia_add}/backend
   npm install --force
 EOF
@@ -106,18 +100,17 @@ EOF
 }
 
 #######################################
-# compiles backend code
+# compila código backend
 # Arguments:
 #   None
 #######################################
 backend_node_build() {
   print_banner
-  printf "${WHITE} 💻 Compilando o código do backend...${GRAY_LIGHT}"
-  printf "\n\n"
+  printf "${WHITE} 💻 Compilando o código do backend...${GRAY_LIGHT}\n\n"
 
   sleep 2
 
-  sudo su - deploy <<EOF
+  sudo -u deploy bash <<EOF
   cd /home/deploy/${instancia_add}/backend
   npm run build
 EOF
@@ -126,18 +119,17 @@ EOF
 }
 
 #######################################
-# updates frontend code
+# atualiza código frontend
 # Arguments:
 #   None
 #######################################
 backend_update() {
   print_banner
-  printf "${WHITE} 💻 Atualizando o backend...${GRAY_LIGHT}"
-  printf "\n\n"
+  printf "${WHITE} 💻 Atualizando o backend...${GRAY_LIGHT}\n\n"
 
   sleep 2
 
-  sudo su - deploy <<EOF
+  sudo -u deploy bash <<EOF
   cd /home/deploy/${empresa_atualizar}
   pm2 stop ${empresa_atualizar}-backend
   git pull
@@ -148,7 +140,6 @@ backend_update() {
   rm -rf dist 
   npm run build
   npx sequelize db:migrate
-  npx sequelize db:migrate
   npx sequelize db:seed
   pm2 start ${empresa_atualizar}-backend
   pm2 save 
@@ -158,18 +149,17 @@ EOF
 }
 
 #######################################
-# runs db migrate
+# executa db migrate
 # Arguments:
 #   None
 #######################################
 backend_db_migrate() {
   print_banner
-  printf "${WHITE} 💻 Executando db:migrate...${GRAY_LIGHT}"
-  printf "\n\n"
+  printf "${WHITE} 💻 Executando db:migrate...${GRAY_LIGHT}\n\n"
 
   sleep 2
 
-  sudo su - deploy <<EOF
+  sudo -u deploy bash <<EOF
   cd /home/deploy/${instancia_add}/backend
   npx sequelize db:migrate
 EOF
@@ -178,18 +168,17 @@ EOF
 }
 
 #######################################
-# runs db seed
+# executa db seed
 # Arguments:
 #   None
 #######################################
 backend_db_seed() {
   print_banner
-  printf "${WHITE} 💻 Executando db:seed...${GRAY_LIGHT}"
-  printf "\n\n"
+  printf "${WHITE} 💻 Executando db:seed...${GRAY_LIGHT}\n\n"
 
   sleep 2
 
-  sudo su - deploy <<EOF
+  sudo -u deploy bash <<EOF
   cd /home/deploy/${instancia_add}/backend
   npx sequelize db:seed:all
 EOF
@@ -198,19 +187,17 @@ EOF
 }
 
 #######################################
-# starts backend using pm2 in 
-# production mode.
+# inicia backend usando pm2 em modo produção.
 # Arguments:
 #   None
 #######################################
 backend_start_pm2() {
   print_banner
-  printf "${WHITE} 💻 Iniciando pm2 (backend)...${GRAY_LIGHT}"
-  printf "\n\n"
+  printf "${WHITE} 💻 Iniciando pm2 (backend)...${GRAY_LIGHT}\n\n"
 
   sleep 2
 
-  sudo su - deploy <<EOF
+  sudo -u deploy bash <<EOF
   cd /home/deploy/${instancia_add}/backend
   pm2 start dist/server.js --name ${instancia_add}-backend
 EOF
@@ -219,23 +206,22 @@ EOF
 }
 
 #######################################
-# updates frontend code
+# configura nginx para backend
 # Arguments:
 #   None
 #######################################
 backend_nginx_setup() {
   print_banner
-  printf "${WHITE} 💻 Configurando nginx (backend)...${GRAY_LIGHT}"
-  printf "\n\n"
+  printf "${WHITE} 💻 Configurando nginx (backend)...${GRAY_LIGHT}\n\n"
 
   sleep 2
 
   backend_hostname=$(echo "${backend_url/https:\/\/}")
 
-sudo su - root << EOF
-cat > /etc/nginx/sites-available/${instancia_add}-backend << 'END'
+sudo bash <<EOF
+cat > /etc/nginx/sites-available/${instancia_add}-backend <<EOL
 server {
-  server_name $backend_hostname;
+  server_name ${backend_hostname};
   location / {
     proxy_pass http://127.0.0.1:${backend_port};
     proxy_http_version 1.1;
@@ -248,7 +234,7 @@ server {
     proxy_cache_bypass \$http_upgrade;
   }
 }
-END
+EOL
 ln -s /etc/nginx/sites-available/${instancia_add}-backend /etc/nginx/sites-enabled
 EOF
 
